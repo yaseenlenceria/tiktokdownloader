@@ -34,6 +34,7 @@ export default function FAQ() {
             We provide the highest quality available from the original video, typically up to 1080p HD.
           </p>
         </div>
+        
 
         <div className="bg-white p-6 rounded-lg shadow-sm">
           <h2 className="text-xl font-semibold mb-3">Is it legal to download TikTok videos?</h2>
@@ -51,6 +52,7 @@ export default function FAQ() {
             - Server maintenance<br />
             Try refreshing the page or checking if the video is publicly available.
           </p>
+          
         </div>
       </div>
     </div>

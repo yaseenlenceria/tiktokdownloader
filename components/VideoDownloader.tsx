@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { analyzeTikTokVideo, type TikTokResponse } from '@/lib/api';
 import { Loader2, Download, Link2, AlertCircle } from 'lucide-react';
+import Image from 'next/image';
 
 export default function VideoDownloader() {
   const [url, setUrl] = useState('');
@@ -19,9 +20,14 @@ export default function VideoDownloader() {
         setLoading(true);
         setError('');
         const data = await analyzeTikTokVideo(value);
-        setResult(data.data);
+        if (data.code === 0 && data.data) {
+          setResult(data.data);
+        } else {
+          throw new Error(data.msg || 'Failed to analyze video');
+        }
       } catch (err: any) {
         setError(err.message || 'Failed to analyze video. Please try again.');
+        setResult(null);
       } finally {
         setLoading(false);
       }
@@ -80,23 +86,39 @@ export default function VideoDownloader() {
 
         {result && (
           <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-100">
-            <div className="aspect-video relative">
-              <img
-                src={result.cover}
-                alt={result.title}
-                className="w-full h-full object-cover"
-              />
+            <div className="aspect-video relative bg-gray-100">
+              {result.cover && (
+                <div className="relative w-full h-full">
+                  <Image
+                    src={result.cover}
+                    alt={result.title || 'TikTok video thumbnail'}
+                    fill
+                    className="object-cover"
+                    unoptimized
+                    priority
+                  />
+                </div>
+              )}
             </div>
             <div className="p-6 space-y-4">
               <h2 className="text-xl font-semibold line-clamp-2">{result.title}</h2>
-              <div className="flex items-center space-x-4">
-                <img
-                  src={result.author.avatar}
-                  alt={result.author.nickname}
-                  className="w-10 h-10 rounded-full border border-gray-200"
-                />
-                <span className="font-medium text-gray-700">{result.author.nickname}</span>
-              </div>
+              {result.author && (
+                <div className="flex items-center space-x-4">
+                  {result.author.avatar && (
+                    <div className="relative w-10 h-10">
+                      <Image
+                        src={result.author.avatar}
+                        alt={result.author.nickname || 'Author avatar'}
+                        width={40}
+                        height={40}
+                        className="rounded-full border border-gray-200"
+                        unoptimized
+                      />
+                    </div>
+                  )}
+                  <span className="font-medium text-gray-700">{result.author.nickname}</span>
+                </div>
+              )}
               <div className="flex flex-col sm:flex-row gap-4">
                 <button
                   onClick={() => handleDownload(result.play)}
